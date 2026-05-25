@@ -18,7 +18,7 @@ Instrumento de autoavaliação comportamental que identifica padrões defensivos
 3. Veja seu resultado com gráfico, destaques e devolutiva
 4. Opcionalmente: salve como PDF ou exporte como texto
 
-##  
+## Privacidade
 
 Nenhum dado é coletado. Tudo fica no navegador do respondente (`localStorage`). Para resetar, basta limpar o cache do navegador.
 
