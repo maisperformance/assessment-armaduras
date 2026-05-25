@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Navegando pela Incerteza — Assessment das Armaduras</title>
+<style>
+  :root {
+    --navy: #0a1f3d;
+    --navy-soft: #142b4f;
+    --navy-deep: #061429;
+    --sky: #1ba3ec;
+    --sky-soft: #3eb5f0;
+    --white: #ffffff;
+    --pearl: #f4f6f9;
+    --gray: #8a9bb0;
+    --gray-soft: #c4ced8;
+    --amber: #d77622;
+    --green: #2d8a3e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--navy-deep);
+    color: var(--navy);
+    padding: 14px;
+    padding-bottom: 110px;
+    line-height: 1.45;
+    font-size: 15px;
+    min-height: 100vh;
+  }
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ===== INTRO ===== */
+  .intro {
+    background: var(--white);
+    padding: 24px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+  .brand {
+    text-align: center;
+    padding: 20px 0 16px;
+    border-bottom: 1px solid var(--pearl);
+    margin-bottom: 20px;
+  }
+  .logo-mp {
+    max-width: 240px;
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+  }
+  .workshop-name {
+    text-align: center;
+    margin-bottom: 4px;
+  }
+  .workshop-name .small {
+    font-size: 11.5px;
+    color: var(--sky);
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .workshop-name h1 {
+    font-size: 22px;
+    color: var(--navy);
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  .subtitle {
+    text-align: center;
+    color: var(--gray);
+    font-size: 12.5px;
+    margin: 10px 0 22px;
+    font-weight: 500;
+  }
+  .anchor {
+    background: var(--pearl);
+    padding: 16px 18px;
+    border-radius: 10px;
+    font-style: italic;
+    color: var(--navy);
+    margin: 18px 0;
+    line-height: 1.55;
+    font-size: 14.5px;
+    border-left: 3px solid var(--sky);
+  }
+  .intro p {
+    margin-bottom: 12px;
+    color: #2c3e54;
+    font-size: 14.5px;
+  }
+  .instructions {
+    background: rgba(27, 163, 236, 0.06);
+    padding: 14px 16px;
+    border-radius: 10px;
+    margin: 16px 0;
+    border: 1px solid rgba(27, 163, 236, 0.2);
+    font-size: 13.5px;
+    color: #2c3e54;
+  }
+  .instructions strong { color: var(--navy); }
+  .name-input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--gray-soft);
+    border-radius: 10px;
+    font-size: 14.5px;
+    font-family: inherit;
+    margin-top: 6px;
+    margin-bottom: 16px;
+    color: var(--navy);
+    background: var(--white);
+  }
+  .name-input:focus {
+    outline: none;
+    border-color: var(--sky);
+  }
+  .start-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    letter-spacing: 0.3px;
+  }
+  .start-btn:active { background: var(--navy-soft); }
+
+  /* ===== QUESTIONÁRIO ===== */
+  .progress {
+    position: sticky;
+    top: 6px;
+    background: var(--white);
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-bottom: 14px;
+    z-index: 10;
+    font-size: 13.5px;
+    font-weight: 600;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+    color: var(--navy);
+  }
+  .progress-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .progress-text { font-weight: 600; }
+  .save-status {
+    font-size: 11px;
+    color: var(--gray);
+    font-weight: 500;
+  }
+  .progress-bar {
+    margin-top: 8px;
+    height: 4px;
+    background: var(--pearl);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--sky);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+  }
+  .card {
+    background: var(--white);
+    padding: 18px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+  }
+  .card.answered { border-left: 3px solid var(--sky); }
+  .item-counter {
+    font-size: 11px;
+    color: var(--gray);
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+  .item-text {
+    font-size: 15px;
+    line-height: 1.5;
+    margin-bottom: 18px;
+    color: var(--navy);
+  }
+  .scale {
+    display: flex;
+    gap: 6px;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .scale-btn {
+    flex: 1;
+    padding: 14px 4px;
+    border: 1.5px solid var(--gray-soft);
+    background: var(--white);
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.12s;
+    min-height: 50px;
+    color: var(--navy);
+  }
+  .scale-btn:active { transform: scale(0.96); }
+  .scale-btn.selected {
+    background: var(--navy);
+    color: var(--white);
+    border-color: var(--navy);
+  }
+  .scale-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--gray);
+    padding: 0 4px;
+    font-weight: 500;
+  }
+  .submit-bar {
+    position: fixed;
+    bottom: 14px;
+    left: 14px;
+    right: 14px;
+    z-index: 20;
+  }
+  .submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--sky);
+    color: var(--white);
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(27, 163, 236, 0.4);
+    letter-spacing: 0.3px;
+  }
+  .submit-btn:disabled {
+    background: var(--gray-soft);
+    color: var(--gray);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    cursor: not-allowed;
+  }
+  .submit-btn:not(:disabled):active { background: var(--sky-soft); }
+
+  /* ===== RESULTADO ===== */
+  .result-header {
+    background: var(--white);
+    padding: 22px;
+    border-radius: 12px;
+    margin-bottom: 14px;
+  }
+  .result-header .small-cap {
+    font-size: 11px;
+    color: var(--sky);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .result-header h2 {
+    font-size: 22px;
+    margin-bottom: 14px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .anchor-quote {
+    background: var(--pearl);
+    padding: 14px 16px;
+    border-radius: 10px;
+    font-style: italic;
+    color: var(--navy);
+    line-height: 1.55;
+    font-size: 14px;
+    border-left: 3px solid var(--sky);
+  }
+  .map {
+    background: var(--white);
+    padding: 22px;
+    border-radius: 12px;
+    margin-bottom: 14px;
+  }
+  .map h3 {
+    font-size: 16px;
+    margin-bottom: 18px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .bar-row { margin-bottom: 16px; }
+  .bar-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    font-size: 13.5px;
+  }
+  .bar-name { font-weight: 500; color: var(--navy); }
+  .bar-name.highlighted { font-weight: 700; }
+  .bar-name .badge {
+    display: inline-block;
+    background: var(--navy);
+    color: var(--white);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 4px;
+    margin-left: 8px;
+    vertical-align: middle;
+    letter-spacing: 0.3px;
+  }
+  .bar-name .badge.alert { background: var(--amber); }
+  .bar-score {
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    color: var(--navy);
+    font-size: 13.5px;
+  }
+  .bar-track {
+    height: 10px;
+    background: var(--pearl);
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+  }
+  .bar-fill {
+    height: 100%;
+    background: var(--gray-soft);
+    border-radius: 5px;
+    transition: width 0.8s ease;
+  }
+  .bar-fill.highlighted { background: var(--navy); }
+  .bar-fill.alert { background: var(--amber); }
+  .bar-track::after {
+    content: '';
+    position: absolute;
+    left: 75%;
+    top: -2px;
+    bottom: -2px;
+    width: 1px;
+    background: rgba(10, 31, 61, 0.15);
+  }
+  .map-note {
+    font-size: 11px;
+    color: var(--gray);
+    margin-top: 10px;
+    text-align: right;
+  }
+  .highlights {
+    background: var(--white);
+    padding: 22px;
+    border-radius: 12px;
+    margin-bottom: 14px;
+  }
+  .highlights h3 {
+    font-size: 16px;
+    margin-bottom: 4px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .subhead {
+    font-size: 13px;
+    color: var(--gray);
+    margin-bottom: 16px;
+  }
+  .highlight-card {
+    border: 1px solid var(--pearl);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    transition: all 0.2s;
+  }
+  .highlight-card.open { border-color: var(--navy); }
+  .highlight-header {
+    padding: 14px 16px;
+    background: var(--pearl);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .highlight-card.open .highlight-header {
+    background: var(--navy);
+    color: var(--white);
+  }
+  .highlight-name {
+    font-size: 14.5px;
+    font-weight: 700;
+  }
+  .highlight-name small {
+    font-size: 12px;
+    font-weight: 500;
+    opacity: 0.7;
+    margin-left: 8px;
+  }
+  .highlight-toggle {
+    font-size: 18px;
+    transition: transform 0.2s;
+  }
+  .highlight-card.open .highlight-toggle { transform: rotate(180deg); }
+  .highlight-body {
+    padding: 0 16px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+  }
+  .highlight-card.open .highlight-body {
+    padding: 16px;
+    max-height: 2000px;
+  }
+  .definition {
+    font-style: italic;
+    color: var(--gray);
+    font-size: 13.5px;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--pearl);
+  }
+  .section-block { margin-bottom: 14px; }
+  .section-block:last-child { margin-bottom: 0; }
+  .section-block h4 {
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--sky);
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+  .section-block p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--navy);
+  }
+  .closing {
+    background: var(--navy);
+    color: var(--white);
+    padding: 22px;
+    border-radius: 12px;
+    margin-bottom: 14px;
+    line-height: 1.6;
+    font-size: 14px;
+  }
+  .closing strong {
+    font-weight: 700;
+    color: var(--sky);
+  }
+  .closing-tag {
+    font-size: 10.5px;
+    letter-spacing: 2.5px;
+    color: var(--sky);
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  .closing-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.15);
+    margin: 14px 0;
+  }
+  .actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .action-btn {
+    flex: 1;
+    padding: 14px;
+    background: var(--white);
+    border: 1.5px solid var(--navy);
+    color: var(--navy);
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .action-btn:active { background: var(--pearl); }
+  .action-btn.primary {
+    background: var(--navy);
+    color: var(--white);
+  }
+  .action-btn.primary:active { background: var(--navy-soft); }
+  .export-result {
+    background: var(--white);
+    padding: 18px;
+    border-radius: 12px;
+    margin-top: 14px;
+    border: 2px solid var(--navy);
+    display: none;
+  }
+  .export-result.show { display: block; }
+  .export-result h2 {
+    font-size: 15px;
+    margin-bottom: 10px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .export-result p {
+    font-size: 13px;
+    color: #2c3e54;
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+  .result-text {
+    width: 100%;
+    min-height: 320px;
+    padding: 12px;
+    border: 1px solid var(--gray-soft);
+    border-radius: 8px;
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 11.5px;
+    resize: vertical;
+    background: var(--pearl);
+    line-height: 1.5;
+    color: var(--navy);
+  }
+  .copy-btn {
+    width: 100%;
+    padding: 14px;
+    margin-top: 10px;
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .copy-btn.copied { background: var(--green); }
+  .footer-brand {
+    text-align: center;
+    padding: 20px 0 8px;
+    font-size: 11px;
+    color: var(--sky-soft);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+  .footer-brand a {
+    color: var(--sky);
+    text-decoration: none;
+  }
+
+  /* IMPRESSÃO / PDF */
+  @media print {
+    body {
+      background: white;
+      padding: 0;
+      color: var(--navy);
+    }
+    .screen { display: none !important; }
+    .screen#screen-result { display: block !important; }
+    .actions, .export-result, .submit-bar, .progress { display: none !important; }
+    .result-header, .map, .highlights, .closing {
+      box-shadow: none;
+      border: 1px solid #ddd;
+      page-break-inside: avoid;
+      margin-bottom: 10px;
+    }
+    .highlight-card { border: 1px solid #ddd !important; page-break-inside: avoid; }
+    .highlight-card .highlight-body {
+      padding: 14px 16px !important;
+      max-height: none !important;
+    }
+    .highlight-toggle { display: none; }
+    .closing { background: var(--navy) !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .closing strong { color: var(--sky) !important; }
+    .bar-fill { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .footer-brand { color: var(--gray) !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== TELA 1: INTRO ===== -->
+<div class="screen active" id="screen-intro">
+  <div class="intro">
+    <div class="brand">
+      <img class="logo-mp" src="data:image/png;base64,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" alt="Mais Performance" />
+    </div>
+
+    <div class="workshop-name">
+      <div class="small">Navegando pela Incerteza</div>
+      <h1>Assessment das Armaduras</h1>
+    </div>
+    <div class="subtitle">5 minutos · 25 perguntas · autoavaliação</div>
+
+    <div class="anchor">
+      Todas as pessoas usam todas as armaduras em algum grau. A reflexão aqui não é se você usa — é quais estão mais automáticas em você neste momento.
+    </div>
+
+    <p>Você verá 25 afirmações sobre comportamentos no trabalho. Para cada uma, marque o quanto ela se aplica a você, de <strong>1 (nunca)</strong> a <strong>5 (sempre)</strong>.</p>
+
+    <div class="instructions">
+      <strong>Importante:</strong> não pense demais em cada afirmação. A primeira reação costuma ser mais honesta. Não existem respostas certas ou erradas — o objetivo é olhar para os próprios padrões com curiosidade, não com julgamento.
+    </div>
+
+    <p style="font-size:13px; color:var(--gray); margin-top:14px;">Identificação (opcional):</p>
+    <input type="text" class="name-input" id="participant-id" placeholder="Seu nome ou um identificador">
+
+    <button class="start-btn" onclick="startAssessment()">Começar</button>
+  </div>
+
+  <div class="footer-brand">
+    @oficial.maisperformance
+  </div>
+</div>
+
+<!-- ===== TELA 2: QUESTIONÁRIO ===== -->
+<div class="screen" id="screen-questions">
+  <div class="progress">
+    <div class="progress-row">
+      <span class="progress-text"><span id="count">0</span>/25 respondidas</span>
+      <span class="save-status" id="save-status"></span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+    </div>
+  </div>
+  <div id="items"></div>
+  <div class="submit-bar">
+    <button class="submit-btn" id="submit-btn" disabled onclick="submitAssessment()">Responda as 25 perguntas</button>
+  </div>
+</div>
+
+<!-- ===== TELA 3: RESULTADO ===== -->
+<div class="screen" id="screen-result">
+  <div class="result-header">
+    <div class="small-cap">Seu padrão atual</div>
+    <h2>Mapa das suas armaduras</h2>
+    <div class="anchor-quote">
+      Todas as pessoas usam todas as armaduras em algum grau. A reflexão aqui não é se você usa — é quais estão mais automáticas em você neste momento.
+    </div>
+  </div>
+
+  <div class="map">
+    <h3>As 5 armaduras</h3>
+    <div id="map-bars"></div>
+    <div class="map-note">Linha vertical: limiar 75% (alerta de armadura mais automática)</div>
+  </div>
+
+  <div class="highlights">
+    <h3>Suas armaduras em destaque</h3>
+    <p class="subhead">As que aparecem com mais força agora. Toque para expandir cada uma.</p>
+    <div id="highlights-list"></div>
+  </div>
+
+  <div class="closing">
+    <div class="closing-tag">A travessia</div>
+    <strong>Armaduras servem.</strong> Em algum momento da sua história, cada uma delas protegeu algo importante.
+    <div class="closing-divider"></div>
+    O problema não é usar a armadura — é o automatismo. Se você consegue notar que está usando, você tem escolha. Se ela é puramente automática, não há escolha.
+    <div class="closing-divider"></div>
+    Conhecer suas armaduras não é virá-las pelo avesso. É <strong>ampliar a chance de escolher</strong> quando vesti-las e quando não.
+  </div>
+
+  <div class="actions">
+    <button class="action-btn primary" onclick="printResult()">Salvar como PDF</button>
+    <button class="action-btn" onclick="showExport()">Exportar texto</button>
+    <button class="action-btn" onclick="restartAssessment()">Refazer</button>
+  </div>
+
+  <div class="export-result" id="export-result">
+    <h2>Resultado para validação</h2>
+    <p>Cole este texto no canal combinado com a equipe da Mais Performance.</p>
+    <textarea class="result-text" id="result-text" readonly></textarea>
+    <button class="copy-btn" id="copy-btn" onclick="copyResult()">Copiar resultado</button>
+  </div>
+
+  <div class="footer-brand">
+    @oficial.maisperformance
+  </div>
+</div>
+
+<script>
+// ============== DADOS ==============
+const armaduras = {
+  PRF: {
+    name: 'Perfeccionismo',
+    definition: 'Defesa contra falha visível, julgamento e exposição de imperfeição.'
+  },
+  CTR: {
+    name: 'Controle',
+    definition: 'Defesa contra incerteza, imprevisto e dependência de outros.'
+  },
+  AUT: {
+    name: 'Autossuficiência',
+    definition: 'Defesa contra parecer incapaz, dependente ou necessitado.'
+  },
+  AGR: {
+    name: 'Agradabilidade Excessiva',
+    definition: 'Defesa contra desagradar, conflitar, ser rejeitado afetivamente.'
+  },
+  OCP: {
+    name: 'Ocupação Crônica',
+    definition: 'Defesa contra a pausa, o silêncio e o contato com o que aparece quando se para.'
+  }
+};
+
+// 23 itens efetivos com cross-loadings #11 e #21 (CTR+AUT)
+// Resultando em 5 cargas por armadura
+const itemsData = [
+  { n: 1, text: "Evito mostrar a alguém um projeto até ter certeza de que está perfeito.", cargas: ['PRF'] },
+  { n: 3, text: "Quando estou com dúvida, prefiro descobrir sozinho a pedir ajuda — mesmo quando demoro mais.", cargas: ['AUT'] },
+  { n: 4, text: "Sinto-me relevante e produtivo quando minha agenda está completamente cheia.", cargas: ['OCP'] },
+  { n: 5, text: "Acompanho passo a passo o trabalho de quem está envolvido em uma atividade comigo para garantir uma entrega de excelência.", cargas: ['CTR'] },
+  { n: 6, text: "Em conversas tensas, busco logo uma solução final para evitar o desconforto.", cargas: ['AGR'] },
+  { n: 7, text: "Reviso meu trabalho várias vezes mesmo depois de pronto, o que atrasa entregar.", cargas: ['PRF'] },
+  { n: 9, text: "Tenho dificuldade de admitir que preciso de ajuda.", cargas: ['AUT'] },
+  { n: 10, text: "Uso o trabalho como justificativa para não participar de situações desconfortáveis.", cargas: ['OCP'] },
+  { n: 11, text: "Centralizo decisões e tarefas em vez de delegar, mesmo quando outros poderiam fazer.", cargas: ['CTR'] },
+  { n: 12, text: "Suavizo minha discordância em reunião, mesmo quando tenho algo a contribuir.", cargas: ['AGR'] },
+  { n: 15, text: "Acumulo responsabilidades em silêncio em vez de compartilhar minhas preocupações antes que virem problema.", cargas: ['AUT'] },
+  { n: 16, text: "Sinto desconforto quando tenho tempo livre sem nada definido para fazer.", cargas: ['OCP'] },
+  { n: 17, text: "Foco no que faltou da minha entrega, mesmo quando o resultado foi bom.", cargas: ['PRF'] },
+  { n: 18, text: "Preciso ter todas as informações antes de começar — sem isso, sinto-me travado(a).", cargas: ['CTR'] },
+  { n: 19, text: "Busco me adequar às necessidades das pessoas e ao ambiente, mesmo que isso signifique me anular um pouco.", cargas: ['AGR'] },
+  { n: 21, text: "Em alguma área do meu trabalho, sou o único que sabe como as coisas funcionam.", cargas: ['CTR'] },
+  { n: 22, text: "No fim do dia, percebo que fiz muita coisa, mas pouco do que realmente importava.", cargas: ['OCP'] },
+  { n: 23, text: "Estabeleço para mim um nível de qualidade quase inatingível.", cargas: ['PRF'] },
+  { n: 24, text: "Fico revisitando mentalmente decisões já tomadas, em vez de aprender com elas e seguir.", cargas: ['PRF'] },
+  { n: 25, text: "Acabo dizendo sim quando deveria ter dito não.", cargas: ['AGR'] },
+  { n: 26, text: "Por vezes me sinto obrigado a agir como 'salvador(a)' das pessoas, fazendo por elas aquilo que não foi pedido, afinal, se eu não fizer, quem fará?", cargas: ['AGR'] },
+  { n: 27, text: "Me cobro para ser produtivo, mesmo em momentos reservados para lazer e descanso.", cargas: ['OCP'] },
+  { n: 30, text: "Tenho desconforto em situações incertas, onde não tenho o controle do processo ou do resultado.", cargas: ['CTR'] },
+  { n: 31, text: "Sinto orgulho de conseguir resolver as coisas sem precisar de ninguém.", cargas: ['AUT'] },
+  { n: 32, text: "Considero ser autossuficiente uma marca de maturidade profissional.", cargas: ['AUT'] }
+];
+
+const devolutivas = {
+  PRF: {
+    gatilho: "Em momentos de exposição, avaliação, erro visível ou entrega pública — situações em que algo seu vai ser olhado por outros.",
+    manifesta: "Você adia entregas até sentir que estão boas o bastante. Revisa demais. Foca no que faltou em vez de no que entregou. Rumina decisões que já tomou, questionando se poderia ter sido melhor.",
+    custo: "Tempo, energia e oportunidades. O perfeccionismo costuma trocar entregas reais por entregas ideais que nunca acontecem — e te separa do feedback que poderia melhorar o trabalho enquanto ele ainda é maleável.",
+    pratica: "Compartilhar uma versão 80% pronta antes de finalizar, pedindo feedback cedo — não no fim. A prática quebra o ciclo de revisão infinita e te aproxima do trabalho real, não do trabalho ideal."
+  },
+  CTR: {
+    gatilho: "Em situações de incerteza, dependência de terceiros, prazo ambíguo — qualquer cenário em que o resultado não está totalmente nas suas mãos.",
+    manifesta: "Você centraliza tarefas que poderia delegar. Acompanha passo a passo o trabalho dos outros. Precisa de todas as informações antes de começar. Tem desconforto em situações incertas em que não tem o controle.",
+    custo: "Você vira gargalo da equipe — e a equipe deixa de propor, porque sabe que será corrigida. A confiança da equipe se desgasta no longo prazo: quem é checado o tempo todo deixa de se sentir confiável. E você acumula trabalho que poderia ter sido bem feito por outras pessoas.",
+    pratica: "Escolher uma tarefa importante para delegar com critérios de qualidade combinados antes e um momento agendado para revisar o resultado. A prática mostra que controle pode ser substituído por clareza — quando o critério está claro, a vigilância deixa de ser necessária."
+  },
+  AUT: {
+    gatilho: "Em situações que envolvem pedir ajuda, admitir que não sabe, ou aparentar dependência — qualquer cenário em que reconhecer um limite pode ser interpretado como incapacidade.",
+    manifesta: "Você enfrenta sozinho mesmo quando está travado. Tem dificuldade de admitir que precisa de ajuda. Acumula responsabilidades em silêncio em vez de compartilhar preocupações antes que virem problema. Vai criando áreas em que só você sabe.",
+    custo: "Sobrecarga e exaustão são a parte visível. A invisível é mais cara: você priva os outros da chance de contribuir, o trabalho fica com a qualidade do que você sozinho consegue (não do que o time poderia ter feito junto), e seu próprio crescimento desacelera — você só aprende com o que já sabia perguntar.",
+    pratica: "Escolher uma situação em que você normalmente enfrentaria sozinho e fazer um pedido específico — não um 'me ajuda' vago, mas algo como 'preciso de 15 minutos para revisar isto comigo'. A especificidade reduz o desconforto de pedir e abre espaço para colaboração real."
+  },
+  AGR: {
+    gatilho: "Em situações de conflito, desaprovação, hierarquia ou medo de decepcionar — qualquer cenário em que sua posição pode incomodar alguém com quem você tem vínculo.",
+    manifesta: "Você suaviza sua discordância mesmo quando tem algo a contribuir. Busca solução rápida para encerrar tensão. Diz 'sim' querendo dizer 'não'. Se anula para se adequar. Por vezes age como 'salvador(a)', fazendo por outros o que não foi pedido.",
+    custo: "Você fica com decisões que não são suas, vivendo escolhas que outros fizeram por você. A relação fica menos honesta no longo prazo — porque sua presença real não chega, só a versão acomodada de você chega. E o ressentimento silencioso eventualmente vaza, geralmente no momento errado.",
+    pratica: "Identificar uma conversa em que você gostaria de discordar e escolher uma frase simples para expressar isso: 'Vejo de outra forma' ou 'Não concordo com X, e queria entender melhor'. Pequenas discordâncias respeitosas constroem confiança real — elas não ameaçam a relação, fortalecem."
+  },
+  OCP: {
+    gatilho: "Diante de pausa, incerteza, vazio — qualquer cenário em que parar significaria refletir ou sentir algo desconfortável.",
+    manifesta: "Você enche a agenda para evitar pausas. Sente-se relevante e produtivo quando está saturado. Usa o trabalho como justificativa para não participar de situações desconfortáveis. Confunde movimento com avanço. Se cobra produtividade mesmo no lazer e descanso.",
+    custo: "Falta visão estratégica, porque sem pausa não há síntese — só reação contínua. As decisões importantes vão sendo adiadas porque 'não há tempo agora'. E há um custo profundo: a pergunta sobre o que realmente importa fica permanentemente em segundo plano.",
+    pratica: "Escolher um momento do dia para parar por 3 minutos — sem agenda, sem celular, sem próxima tarefa. Apenas notar o que aparece e perguntar a si: 'o que importa agora?'. A pausa breve devolve a possibilidade de escolha; sem ela, tudo vira reação."
+  }
+};
+
+// ============== STATE ==============
+const STORAGE_KEY = 'maisperformance-armaduras-v2';
+let state = {
+  participantId: '',
+  answers: {},
+  itemOrder: [],
+  startedAt: null,
+  completedAt: null
+};
+let saveTimeout = null;
+
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+async function loadState() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const data = JSON.parse(saved);
+      if (data.completedAt) {
+        // já completou, começa do zero
+        state = { participantId: '', answers: {}, itemOrder: [], startedAt: null, completedAt: null };
+      } else if (Object.keys(data.answers || {}).length > 0) {
+        state = data;
+        if (state.itemOrder && state.itemOrder.length === itemsData.length) {
+          document.getElementById('screen-intro').classList.remove('active');
+          document.getElementById('screen-questions').classList.add('active');
+          renderQuestions();
+          return;
+        }
+      }
+    }
+  } catch (e) { /* primeira vez ou storage indisponível */ }
+}
+
+function saveState() {
+  if (saveTimeout) clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      showSaveStatus('salvo');
+    } catch (e) {
+      showSaveStatus('erro ao salvar', true);
+    }
+  }, 500);
+}
+
+function showSaveStatus(msg, isError) {
+  const el = document.getElementById('save-status');
+  if (!el) return;
+  el.textContent = '· ' + msg;
+  el.style.color = isError ? '#c44' : '#8a9bb0';
+  setTimeout(() => { el.textContent = ''; }, 1500);
+}
+
+// ============== FLUXO ==============
+function startAssessment() {
+  state.participantId = document.getElementById('participant-id').value.trim();
+  state.startedAt = new Date().toISOString();
+  state.itemOrder = shuffleArray(itemsData.map(i => i.n));
+  saveState();
+  document.getElementById('screen-intro').classList.remove('active');
+  document.getElementById('screen-questions').classList.add('active');
+  renderQuestions();
+  window.scrollTo(0, 0);
+}
+
+function renderQuestions() {
+  const container = document.getElementById('items');
+  container.innerHTML = '';
+  state.itemOrder.forEach((itemNum, idx) => {
+    const item = itemsData.find(i => i.n === itemNum);
+    const ans = state.answers[itemNum];
+    const card = document.createElement('div');
+    card.className = 'card' + (ans ? ' answered' : '');
+    card.innerHTML = `
+      <div class="item-counter">Pergunta ${idx + 1} de ${itemsData.length}</div>
+      <div class="item-text">${item.text}</div>
+      <div class="scale">
+        ${[1,2,3,4,5].map(v => `
+          <button class="scale-btn ${ans === v ? 'selected' : ''}" onclick="setAnswer(${itemNum}, ${v})">${v}</button>
+        `).join('')}
+      </div>
+      <div class="scale-labels"><span>nunca</span><span>sempre</span></div>
+    `;
+    container.appendChild(card);
+  });
+  updateProgress();
+}
+
+function setAnswer(itemNum, value) {
+  state.answers[itemNum] = value;
+  saveState();
+  const idx = state.itemOrder.indexOf(itemNum);
+  const cards = document.querySelectorAll('#items .card');
+  const card = cards[idx];
+  if (card) {
+    card.classList.add('answered');
+    card.querySelectorAll('.scale-btn').forEach((btn, i) => {
+      if (i + 1 === value) btn.classList.add('selected');
+      else btn.classList.remove('selected');
+    });
+  }
+  updateProgress();
+}
+
+function updateProgress() {
+  const total = itemsData.length;
+  const count = Object.keys(state.answers).length;
+  document.getElementById('count').textContent = count;
+  document.getElementById('progress-fill').style.width = (count/total * 100) + '%';
+  const btn = document.getElementById('submit-btn');
+  if (count === total) {
+    btn.disabled = false;
+    btn.textContent = 'Ver resultado';
+  } else {
+    btn.disabled = true;
+    btn.textContent = `Faltam ${total - count} ${total-count === 1 ? 'pergunta' : 'perguntas'}`;
+  }
+}
+
+function submitAssessment() {
+  state.completedAt = new Date().toISOString();
+  saveState();
+  document.getElementById('screen-questions').classList.remove('active');
+  document.getElementById('screen-result').classList.add('active');
+  renderResult();
+  window.scrollTo(0, 0);
+}
+
+// ============== CÁLCULO ==============
+function calculateScores() {
+  const scores = {};
+  Object.keys(armaduras).forEach(arm => {
+    const itensCarregando = itemsData.filter(it => it.cargas.includes(arm));
+    if (itensCarregando.length === 0) {
+      scores[arm] = 0;
+      return;
+    }
+    const soma = itensCarregando.reduce((acc, it) => acc + (state.answers[it.n] || 0), 0);
+    scores[arm] = soma / itensCarregando.length;
+  });
+  return scores;
+}
+
+function identifyHighlights(scores) {
+  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  const highlights = new Set();
+  highlights.add(sorted[0][0]);
+  highlights.add(sorted[1][0]);
+  // Threshold de alerta: 4.0 em escala 1-5 (equivalente a 75% na escala 0-100)
+  for (let i = 2; i < sorted.length && highlights.size < 3; i++) {
+    if (sorted[i][1] >= 4.0) highlights.add(sorted[i][0]);
+  }
+  return Array.from(highlights);
+}
+
+// Converte score Likert (1-5) para percentual (0-100)
+function scoreToPercent(score) {
+  return Math.round((score - 1) / 4 * 100);
+}
+
+// ============== RENDER RESULT ==============
+function renderResult() {
+  const scores = calculateScores();
+  const highlights = identifyHighlights(scores);
+
+  const mapContainer = document.getElementById('map-bars');
+  const sortedArm = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  mapContainer.innerHTML = sortedArm.map(([arm, score]) => {
+    const isHighlight = highlights.includes(arm);
+    const isAlert = score >= 4.0 && !isHighlight;
+    const percent = scoreToPercent(score);
+    return `
+      <div class="bar-row">
+        <div class="bar-label">
+          <span class="bar-name ${isHighlight ? 'highlighted' : ''}">
+            ${armaduras[arm].name}
+            ${isHighlight ? '<span class="badge">destaque</span>' : ''}
+            ${isAlert ? '<span class="badge alert">≥75%</span>' : ''}
+          </span>
+          <span class="bar-score">${percent}%</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill ${isHighlight ? 'highlighted' : (isAlert ? 'alert' : '')}" style="width: ${percent}%"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  const highlightsContainer = document.getElementById('highlights-list');
+  highlightsContainer.innerHTML = highlights.map((arm, idx) => {
+    const dev = devolutivas[arm];
+    const percent = scoreToPercent(scores[arm]);
+    return `
+      <div class="highlight-card ${idx === 0 ? 'open' : ''}" onclick="toggleHighlight(this)">
+        <div class="highlight-header">
+          <div class="highlight-name">${armaduras[arm].name}<small>${percent}%</small></div>
+          <div class="highlight-toggle">▾</div>
+        </div>
+        <div class="highlight-body">
+          <div class="definition">${armaduras[arm].definition}</div>
+          <div class="section-block">
+            <h4>Quando essa armadura tende a aparecer</h4>
+            <p>${dev.gatilho}</p>
+          </div>
+          <div class="section-block">
+            <h4>Como ela costuma se manifestar em você</h4>
+            <p>${dev.manifesta}</p>
+          </div>
+          <div class="section-block">
+            <h4>O que isso pode estar te custando</h4>
+            <p>${dev.custo}</p>
+          </div>
+          <div class="section-block">
+            <h4>Uma prática que você pode experimentar</h4>
+            <p>${dev.pratica}</p>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function toggleHighlight(card) {
+  card.classList.toggle('open');
+}
+
+function printResult() {
+  // Abre todos os destaques para que apareçam no PDF
+  document.querySelectorAll('.highlight-card').forEach(c => c.classList.add('open'));
+  // Pequeno delay para o layout assentar
+  setTimeout(() => window.print(), 200);
+}
+
+// ============== EXPORT ==============
+function showExport() {
+  const scores = calculateScores();
+  const highlights = identifyHighlights(scores);
+  const pid = state.participantId || 'anônimo';
+
+  let txt = `MAIS PERFORMANCE — Navegando pela Incerteza\n`;
+  txt += `Assessment das Armaduras v2\n`;
+  txt += `─────────────────────────────\n`;
+  txt += `Participante: ${pid}\n`;
+  txt += `Iniciado:   ${new Date(state.startedAt).toLocaleString('pt-BR')}\n`;
+  txt += `Finalizado: ${new Date(state.completedAt).toLocaleString('pt-BR')}\n`;
+  const duracaoMs = new Date(state.completedAt) - new Date(state.startedAt);
+  const duracaoMin = Math.floor(duracaoMs / 60000);
+  const duracaoSeg = Math.floor((duracaoMs % 60000) / 1000);
+  txt += `Duração:    ${duracaoMin}m ${duracaoSeg}s\n`;
+  txt += `─────────────────────────────\n\n`;
+
+  txt += `SCORES POR ARMADURA (% de uso automático)\n`;
+  const sortedArm = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  sortedArm.forEach(([arm, score]) => {
+    const percent = scoreToPercent(score);
+    const hl = highlights.includes(arm) ? ' ★ DESTAQUE' : '';
+    txt += `${armaduras[arm].name.padEnd(28)} ${String(percent).padStart(3)}%${hl}\n`;
+  });
+
+  txt += `\nARMADURAS EM DESTAQUE\n`;
+  highlights.forEach(arm => {
+    txt += `- ${armaduras[arm].name} (${scoreToPercent(scores[arm])}%)\n`;
+  });
+
+  txt += `\n─────────────────────────────\n`;
+  txt += `RESPOSTAS POR ITEM\n`;
+  const sortedItems = [...itemsData].sort((a, b) => a.n - b.n);
+  sortedItems.forEach(it => {
+    const ans = state.answers[it.n] || '-';
+    txt += `${String(it.n).padStart(2,'0')}: ${ans}\n`;
+  });
+
+  txt += `\n─────────────────────────────\n`;
+  txt += `@oficial.maisperformance\n`;
+
+  document.getElementById('result-text').value = txt;
+  document.getElementById('export-result').classList.add('show');
+  setTimeout(() => {
+    document.getElementById('export-result').scrollIntoView({ behavior: 'smooth' });
+  }, 100);
+}
+
+async function copyResult() {
+  const text = document.getElementById('result-text').value;
+  const btn = document.getElementById('copy-btn');
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const ta = document.getElementById('result-text');
+      ta.select();
+      document.execCommand('copy');
+    }
+    btn.textContent = '✓ Copiado!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copiar resultado';
+      btn.classList.remove('copied');
+    }, 2000);
+  } catch (e) {
+    btn.textContent = 'Selecione manualmente';
+    setTimeout(() => { btn.textContent = 'Copiar resultado'; }, 2500);
+  }
+}
+
+async function restartAssessment() {
+  if (!confirm('Apagar respostas e recomeçar?')) return;
+  state = { participantId: '', answers: {}, itemOrder: [], startedAt: null, completedAt: null };
+  try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+  document.getElementById('screen-result').classList.remove('active');
+  document.getElementById('export-result').classList.remove('show');
+  document.getElementById('screen-intro').classList.add('active');
+  document.getElementById('participant-id').value = '';
+  window.scrollTo(0, 0);
+}
+
+loadState();
+</script>
+
+</body>
+</html>
